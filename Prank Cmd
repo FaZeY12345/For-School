@@ -1,0 +1,6 @@
+for shut down:
+shutdown -i
+
+arp -a
+
+for a message: msg * fazey
