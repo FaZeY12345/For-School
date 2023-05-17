@@ -4,3 +4,15 @@ shutdown -i
 arp -a
 
 for a message: msg * fazey
+ 
+access to cmd:
+first open file loaction then add it to desktop and name it iexplorer
+if it didnt work
+download hxd english put the cmd in side it then go very down then change the last 2 
+numbers and make it from 00 to 09
+if u got the problem: put cmd again and press sarch and then find
+sarch for disablecmd and add unicode string change any thing in side it and save it
+
+best v1 : tasklist
+
+best v2 :  taskkill /IM "  " /f
