@@ -1,1 +1,122 @@
-javascript:void%20function(){%22chrome.google.com%22===location.hostname%26%26location.pathname.startsWith(%22/webstore%22)%3Fchrome.management.getAll(a=%3E{function%20b(a){chrome.webstorePrivate.getExtensionStatus(a.id,b=%3E{if(%22force_installed%22===b){const%20b=prompt(`What%20do%20you%20want%20to%20do%20with%20${a.name}%3F%20(enable/disable)`);var%20c=%22%22===a.homepageUrl%3F`%3Cb%3E%3Ca%20title=%22${a.description}%22%3E${a.name}%3C/a%3E%3C/b%3E`:`%3Cb%3E%3Ca%20href=%22${a.homepageUrl}%22%20title=%22${a.description}%22%3E${a.name}%3C/a%3E%3C/b%3E`,d=%22%22;%22disable%22===b.toLowerCase()%3F(chrome.management.setEnabled(a.id,!1),d+=`%3Cp%3EDisabled%20${c}%3C/p%3E`):%22enable%22===b.toLowerCase()%3F(chrome.management.setEnabled(a.id,!0),d+=`%3Cp%3EEnabled%20${c}%3C/p%3E`):alert(%22Invalid%20option,%20try%20again!%22),document.body.innerHTML+=d}})}document.body.innerHTML=%22%22,document.write(%22\n%3Clink%20rel=\%22preconnect\%22%20href=\%22https://fonts.googleapis.com\%22%3E\n%3Clink%20rel=\%22preconnect\%22%20href=\%22https://fonts.gstatic.com\%22%20crossorigin%3E\n%3Clink%20href=\%22https://fonts.googleapis.com/css2%3Ff...\%22%20rel=\%22stylesheet\%22%3E\n%3Cstyle%3E\n%20%20body%20{\n%20%20%20%20%20%20font-family:%20'Montserrat',%20sans-serif;\n%20%20}\n%20%20a%20{\n%20%20%20%20%20%20text-decoration:%20none;\n%20%20%20%20%20%20color:%20blue\n%20%20}\n%20%20p%20{\n%20%20%20%20%20%20margin:%200px\n%20%20}\n%3C/style%3E\n%3Ch1%20style=\%22text-align:%20center\%22%3EExtension%20Panel%3C/h1%3E\n%22),a.forEach(a=%3Eb(a))}):(alert(%22Run%20this%20script%20again%20but%20while%20on%20this%20page%22),location.href=%22https://chrome.google.com/webstore_%22)}();
+-- ESP Script by Bing
+-- Press Q to toggle ESP on or off
+-- You can change the settings below
+
+local ESP_ENABLED = true -- Whether the ESP is enabled by default
+local ESP_KEY = Enum.KeyCode.Q -- The key to toggle the ESP
+local ESP_COLOR = Color3.new(1, 0, 0) -- The color of the ESP text
+local ESP_TRANSPARENCY = 0.5 -- The transparency of the ESP text
+local ESP_OUTLINE = true -- Whether the ESP text has an outline
+local ESP_OUTLINE_COLOR = Color3.new(0, 0, 0) -- The color of the ESP text outline
+local ESP_OUTLINE_TRANSPARENCY = 0.5 -- The transparency of the ESP text outline
+local ESP_SIZE = 16 -- The size of the ESP text
+local ESP_FONT = Enum.Font.SourceSansBold -- The font of the ESP text
+local ESP_TEAM_CHECK = true -- Whether the ESP only shows enemies
+
+-- Do not edit below this line unless you know what you are doing
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local function CreateESP(Player)
+    local Character = Player.Character or Player.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Head = Character:WaitForChild("Head")
+    local BillboardGui = Instance.new("BillboardGui", Head)
+    BillboardGui.Name = "ESP"
+    BillboardGui.AlwaysOnTop = true
+    BillboardGui.LightInfluence = 0
+    BillboardGui.Size = UDim2.new(0, 200, 0, 50)
+    BillboardGui.StudsOffset = Vector3.new(0, 2, 0)
+    BillboardGui.Enabled = false
+    local TextLabel = Instance.new("TextLabel", BillboardGui)
+    TextLabel.Name = "Tag"
+    TextLabel.BackgroundTransparency = 1
+    TextLabel.Size = UDim2.new(1, 0, 1, 0)
+    TextLabel.TextColor3 = ESP_COLOR
+    TextLabel.TextTransparency = ESP_TRANSPARENCY
+    TextLabel.TextStrokeColor3 = ESP_OUTLINE_COLOR
+    TextLabel.TextStrokeTransparency = ESP_OUTLINE_TRANSPARENCY
+    TextLabel.TextSize = ESP_SIZE
+    TextLabel.Font = ESP_FONT
+    TextLabel.TextScaled = true
+    
+    local function UpdateESP()
+        if not Player or not Character or not Humanoid or not Head or not BillboardGui or not TextLabel then return end
+        if Humanoid.Health <= 0 then
+            BillboardGui.Enabled = false
+            return
+        end
+        if Player == LocalPlayer then
+            BillboardGui.Enabled = false
+            return
+        end
+        if ESP_TEAM_CHECK and Player.TeamColor == LocalPlayer.TeamColor then
+            BillboardGui.Enabled = false
+            return
+        end
+        
+        local ScreenPoint, OnScreen = Camera:WorldToScreenPoint(Head.Position)
+        if OnScreen then
+            BillboardGui.Enabled = true
+            
+            local MaxHealth = Humanoid.MaxHealth or 100
+            local Health = Humanoid.Health or 0
+            
+            local HealthPercent = math.floor((Health / MaxHealth) * 100)
+            local HealthText = HealthPercent .. "% " .. Health .. "/" .. MaxHealth
+            
+            TextLabel.Text = Player.Name .. "\n" .. HealthText
+            
+        else
+            BillboardGui.Enabled = false
+            
+        end
+        
+    end
+    
+    UpdateESP()
+    
+    Humanoid.Died:Connect(function()
+        BillboardGui:Destroy()
+    end)
+    
+    RunService.RenderStepped:Connect(UpdateESP)
+    
+end
+
+for i, v in pairs(Players:GetPlayers()) do
+    CreateESP(v)
+end
+
+Players.PlayerAdded:Connect(function(v)
+    CreateESP(v)
+end)
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == ESP_KEY then
+        ESP_ENABLED = not ESP_ENABLED
+        
+        for i, v in pairs(Players:GetPlayers()) do
+            
+            local Character = v.Character or v.CharacterAdded:Wait()
+            local Head = Character:WaitForChild("Head")
+            local BillboardGui = Head:FindFirstChild("ESP")
+            
+            if BillboardGui then
+                
+                BillboardGui.Enabled = ESP_ENABLED
+                
+            end
+            
+        end
+        
+    end
+    
+end)
+
+print("ESP Script loaded successfully!")
